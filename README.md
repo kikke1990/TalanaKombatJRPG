@@ -14,7 +14,8 @@ chico)
 API /API/talana/kombat
 Method POST
 
-"api desde el browser.png"
+![Alt-Text](/APIBrowser.png)
+APIBrowser.png
 
 Retorna una lista con la interpretacion de las acciones enviadas desde lso botones.
 
