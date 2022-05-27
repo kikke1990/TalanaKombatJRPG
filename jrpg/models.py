@@ -25,7 +25,7 @@ class Blow(models.Model):
 
     def __str__(self):
         if self.blw_nmonico == 'P':
-            return f'''da un {self.blw_name}'''
+            return f''' da un {self.blw_name}'''
         return f''' da una {self.blw_name}'''
 
 class SpecialBlow(models.Model):

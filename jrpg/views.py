@@ -66,8 +66,15 @@ class TalanaKombatJRPGAPIView(APIView):
                     start_player = 2
         return start_player
 
+    def set_winner(self,game,player):
+        game.ply_wing = player
+        game.save()
+        EventGame(
+            gam_id=game,
+            evg_descripcion = f'''{game.ply_wing.ply_nombre} win!'''
+        ).save()
+
     def post(self, request):
-        print(request.data)
         """juego de ejemplo"""
         game = request.data
         context = {}
@@ -87,22 +94,10 @@ class TalanaKombatJRPGAPIView(APIView):
             second_turn_player_point = second_turn_player.ply_life_point
             for index in range(0,rango):
                 if first_turn_player_point<=0:
-                    obj_game.ply_wing = first_turn_player
-                    obj_game.save()
-
-                    EventGame(
-                        gam_id=obj_game,
-                        evg_descripcion = f'''{obj_game.ply_wing.ply_nombre} win!'''
-                    ).save()
+                    self.set_winner(obj_game,second_turn_player)
                     break
                 elif second_turn_player_point<=0:
-                    obj_game.ply_wing = second_turn_player
-                    obj_game.save()
-
-                    EventGame(
-                        gam_id=obj_game,
-                        evg_descripcion = f'''{obj_game.ply_wing.ply_nombre} win!'''
-                    ).save()
+                    self.set_winner(obj_game,first_turn_player)
                     break
                 else:
                     if first_player == 1:
@@ -128,6 +123,10 @@ class TalanaKombatJRPGAPIView(APIView):
                         ).save()
                         obj_damage = Damage.objects.filter(sbw_id_id=first_special_blow.sbw_id).first()
                         second_turn_player_point -= obj_damage.dmg_point
+
+                        if second_turn_player_point<=0:
+                            self.set_winner(obj_game,first_turn_player)
+                            break
                     else:
                         for movement in first_turn_movement:
                             obj_movement = Movement.objects.filter(mov_nmonico=movement).first()
@@ -139,8 +138,8 @@ class TalanaKombatJRPGAPIView(APIView):
                         accion = f'''{first_turn_player} sintió el verdadero temor'''
                         obj_blow = Blow.objects.filter(blw_nmonico=first_turn_blow).first()
                         if obj_blow is not None:
+
                             accion = f'''{first_turn_player}{obj_blow}'''
-                            
                             obj_damage = Damage.objects.filter(dmg_ind_special=False,blw_id=obj_blow).first()
                             second_turn_player_point -= obj_damage.dmg_point
 
@@ -148,6 +147,10 @@ class TalanaKombatJRPGAPIView(APIView):
                             gam_id=obj_game,
                             evg_descripcion = accion
                         ).save()
+
+                        if second_turn_player_point<=0:
+                            self.set_winner(obj_game,first_turn_player)
+                            break
                     
                     second_special_blow = PlayerSpecialBlow.objects.filter(ply=second_turn_player,sbw__sbw_combination=second_turn_combination).first()
                     if second_special_blow is not None:
@@ -158,6 +161,10 @@ class TalanaKombatJRPGAPIView(APIView):
 
                         obj_damage = Damage.objects.filter(sbw_id_id=second_special_blow.sbw).first()
                         first_turn_player_point -= obj_damage.dmg_point
+
+                        if first_turn_player_point<=0:
+                            self.set_winner(obj_game,second_turn_player)
+                            break
                     else:
                         for movement in second_turn_movement:
                             obj_movement = Movement.objects.filter(mov_nmonico=movement).first()
@@ -177,6 +184,16 @@ class TalanaKombatJRPGAPIView(APIView):
                             gam_id=obj_game,
                             evg_descripcion = accion
                         ).save()
+
+                        if first_turn_player_point<=0:
+                            self.set_winner(obj_game,second_turn_player)
+                            break
+            
+            if obj_game.ply_wing is None:
+                EventGame(
+                    gam_id=obj_game,
+                    evg_descripcion = 'Es un empate!'
+                ).save()
             context = {
                 'respuesta':list(obj_game.event_games.all().extra(select={'action': 'evg_descripcion'}).values('action').order_by('evg_id'))
             }
