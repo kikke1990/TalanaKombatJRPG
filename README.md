@@ -20,7 +20,8 @@ APIBrowser.png
 Retorna una lista con la interpretacion de las acciones enviadas desde lso botones.
 
 ejemplo:
-  se envia:
+ 
+ se envia:
     {
         "player1": {
             "movimientos": ["SDD","DSD","SA","DSD"],
