@@ -11,6 +11,17 @@ en caso de empate, parte el con menos movimientos, si empatan de nuevo, inicia e
 golpes, si hay empate de nuevo, inicia el player 1 (total el player 2 siempre es del hermano
 chico)
 
+El proyecto se encuentra desarrollado en python con el framework Django y corresponde a un api, la cual recibe los datos en formato Json, los cuales son usados para pbtener funcionalidades desde una base de datos. Tambien se registra el detalle de cada juego y se devuelve su interpretacion en formato JSON.
+
+Para iniciar el proyecto.
+
+1. Clonar el repositorio.
+2. Crear un entono virtual ---> Ej: virtualenv venv
+3. Activar el entorno virtual --> ../venv/bin/activate
+4. Instalar las dependencias del archivo requeriments ---> pip install -r requirements.txt
+5. Iniciar el proyecto con python manage.py runserver 127.0.0.1:8000
+
+
 API /API/talana/kombat
 Method POST
 
